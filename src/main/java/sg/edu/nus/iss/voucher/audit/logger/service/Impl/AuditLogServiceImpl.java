@@ -48,7 +48,6 @@ public class AuditLogServiceImpl implements AuditLogService {
 
         auditLogRepository.save(auditLog);
 
-        auditLogRepository.save(auditLog);
     }
 	
 //	@Override

@@ -13,7 +13,7 @@ public interface AuditLogRepository extends JpaRepository<AuditLog, Integer> {
 
 	//Page<AuditLog> retrieveAuditLogWith(Pageable pageable);
 	
-	@Query("SELECT c FROM AuditLog c")
+	@Query("SELECT auditLogData FROM AuditLog auditLogData")
     Page<AuditLog> retrieveAuditLogWith(Pageable pageable);
 	
 

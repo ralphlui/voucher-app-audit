@@ -1,5 +1,7 @@
 package sg.edu.nus.iss.voucher.audit.logger.dto;
 
+import java.util.Date;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,6 +9,7 @@ import lombok.Setter;
 @Setter
 public class AuditLogDTO {
 	
+	private Integer auditId;
 	private String statusCode;
     private String userId;
     private String username;
@@ -15,6 +18,8 @@ public class AuditLogDTO {
     private String requestActionEndpoint;
     private String responseStatus;
     private String requestType;
+    private Date insertDate;
+    private Date lastupdatedDate;
     private String remarks;
 	
 	public AuditLogDTO() {

@@ -16,7 +16,11 @@ import lombok.Setter;
 @Setter
 @Table(name="audit_log")
 public class AuditLog {
-
+	
+	public AuditLog() {
+       super();
+    }
+	
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) 
     @Column(name = "audit_id")
@@ -54,6 +58,24 @@ public class AuditLog {
 
     @Column(name = "remarks")
     private String remarks;
+
+	public AuditLog(Integer auditId, String statusCode, String userId, String username, String activityType,
+			String activityDescription, String requestActionEndpoint, String responseStatus, String requestType,
+			Date insertDate, Date lastupdatedDate, String remarks) {
+		super();
+		this.auditId = auditId;
+		this.statusCode = statusCode;
+		this.userId = userId;
+		this.username = username;
+		this.activityType = activityType;
+		this.activityDescription = activityDescription;
+		this.requestActionEndpoint = requestActionEndpoint;
+		this.responseStatus = responseStatus;
+		this.requestType = requestType;
+		this.insertDate = insertDate;
+		this.lastupdatedDate = lastupdatedDate;
+		this.remarks = remarks;
+	}
 
 }
 
