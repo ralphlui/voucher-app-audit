@@ -1,7 +1,5 @@
 package sg.edu.nus.iss.voucher.audit.logger.dto;
 
-import java.util.Date;
-
 import lombok.Getter;
 import lombok.Setter;
 
