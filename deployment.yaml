@@ -62,6 +62,6 @@ spec:
     app: voucher-app-audit
   ports:
     - protocol: TCP
-      port: 8080
+      port: 8084
       targetPort: 8084
   type: NodePort
