@@ -3,6 +3,7 @@ package sg.edu.nus.iss.voucher.audit.logger.aws;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import io.awspring.cloud.sqs.operations.SqsTemplate;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
@@ -11,6 +12,7 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsAsyncClient;
 
 @Configuration
+@Profile("!test")
 public class AWSConfig {
 
   @Value("${cloud.aws.credentials.accessKey}")
