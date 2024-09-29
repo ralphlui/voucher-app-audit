@@ -8,13 +8,15 @@ import org.springframework.data.domain.Pageable;
 import sg.edu.nus.iss.voucher.audit.logger.dto.AuditLogDTO;
 
 public interface AuditLogService {
-	
-	//AuditLogDTO executeAuditLog(AuditLog auditLog);
-	
+
+	// AuditLogDTO executeAuditLog(AuditLog auditLog);
+
 	void executeAuditLog(AuditLogDTO auditLogDTO);
 
-	//void executeAuditLog(AuditLog auditLog);
-	
+	// void executeAuditLog(AuditLog auditLog);
+
 	Map<Long, List<AuditLogDTO>> retrieveAllAuditLogs(Pageable pageable);
+
+	Map<Long, List<AuditLogDTO>> searchAuditLogs(String activityType, String userId, Pageable pageable);
 
 }

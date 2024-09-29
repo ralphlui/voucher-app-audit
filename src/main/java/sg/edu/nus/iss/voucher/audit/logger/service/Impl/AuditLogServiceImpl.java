@@ -1,7 +1,6 @@
 package sg.edu.nus.iss.voucher.audit.logger.service.Impl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -50,11 +49,6 @@ public class AuditLogServiceImpl implements AuditLogService {
 
     }
 	
-//	@Override
-//    public void executeAuditLog(AuditLog auditLog) {
-//        auditLogRepository.save(auditLog);
-//    }
-	
 	public Map<Long, List<AuditLogDTO>> retrieveAllAuditLogs(Pageable pageable) {
 		logger.info("Retrieving all audit trail data...");
 		Map<Long, List<AuditLogDTO>> result = new HashMap<>();
@@ -78,6 +72,46 @@ public class AuditLogServiceImpl implements AuditLogService {
 
 		return result;
 	}
+	
+	@Override
+    public Map<Long, List<AuditLogDTO>> searchAuditLogs(String activityType, String userId, Pageable pageable) {
+        try {
+            Page<AuditLog> auditLogsResult;
+            if (activityType != null && !activityType.isEmpty() && userId != null && !userId.isEmpty()) {
+                // Case 1: Search by both activityType and userId
+                auditLogsResult = auditLogRepository.findByActivityTypeAndUserId(activityType, userId, pageable);
+            } else if (activityType != null && !activityType.isEmpty()) {
+                // Case 2: Search by activityType only
+                auditLogsResult = auditLogRepository.findByActivityType(activityType, pageable);
+            } else if (userId != null && !userId.isEmpty()) {
+                // Case 3: Search by userId only
+                auditLogsResult = auditLogRepository.findByUserId(userId, pageable);
+            } else {
+                // If no parameters provided, return empty result
+                logger.warn("No valid search parameters provided.");
+                return new HashMap<>();
+            }
+
+            long totalRecord = auditLogsResult.getTotalElements();
+            Map<Long, List<AuditLogDTO>> result = new HashMap<>();
+            List<AuditLogDTO> auditDTOList = new ArrayList<>();
+
+            if (totalRecord > 0) {
+                for (AuditLog auditLog : auditLogsResult.getContent()) {
+                    AuditLogDTO auditLogDTO = DTOMapper.toauditLogDTO(auditLog);
+                    auditDTOList.add(auditLogDTO);
+                }
+            }
+
+            logger.info("Total record in searchAuditLogs: {}", totalRecord);
+            result.put(totalRecord, auditDTOList);
+            return result;
+
+        } catch (Exception ex) {
+            logger.error("Exception in searchAuditLogs: {}", ex.toString());
+            throw ex;
+        }
+    }
 
 	
 

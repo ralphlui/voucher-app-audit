@@ -20,7 +20,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import sg.edu.nus.iss.voucher.audit.logger.dto.*;
+import sg.edu.nus.iss.voucher.audit.logger.dto.APIResponse;
+import sg.edu.nus.iss.voucher.audit.logger.dto.AuditLogDTO;
 import sg.edu.nus.iss.voucher.audit.logger.service.AuditLogService;
 
 
@@ -33,6 +34,7 @@ public class AuditLogController {
 	
 	@Autowired
 	private AuditLogService auditLogService;
+	
 	
 	@PostMapping("/execute")
     public ResponseEntity<String> addAuditLog(@RequestBody AuditLogDTO auditLogDTO) {
@@ -77,5 +79,36 @@ public class AuditLogController {
 			throw ex;
 		}
 	}
+	
+	@GetMapping(value = "/searchByParams", produces = "application/json")
+    public ResponseEntity<APIResponse<List<AuditLogDTO>>> searchAuditLogs(
+            @RequestParam(required = false) String activityType,
+            @RequestParam(required = false) String userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
 
+        logger.info("Searching audit logs with activityType: {}, userId: {}", activityType, userId);
+
+        try {
+            Pageable pageable = PageRequest.of(page, size,Sort.by("lastupdatedDate").ascending());
+            Map<Long, List<AuditLogDTO>> resultMap = auditLogService.searchAuditLogs(activityType, userId, pageable);
+
+            if (resultMap.isEmpty()) {
+                String message = "No audit logs found.";
+                logger.error(message);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(APIResponse.error(message));
+            }
+
+            long totalRecord = resultMap.keySet().stream().findFirst().orElse(0L);
+            List<AuditLogDTO> auditLogDTOList = resultMap.getOrDefault(totalRecord, new ArrayList<>());
+
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(APIResponse.success(auditLogDTOList, "Audit logs retrieved successfully.", totalRecord));
+
+        } catch (Exception ex) {
+            logger.error("An error occurred while searching audit logs.", ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(APIResponse.error("Error occurred while searching audit logs."));
+        }
+    }
 }
