@@ -25,7 +25,7 @@ public class AwsSqsListener {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 	
-	@SqsListener("${cloud.aws.sqs.queue.name}")
+	@SqsListener(value = "${cloud.aws.sqs.queue.url}")
 	public void receiveMessage(String message) {
         try {
             logger.info("Received Message from SQS: {}", message);
