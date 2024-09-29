@@ -44,6 +44,21 @@ spec:
                 configMapKeyRef:
                   name: my-configmap
                   key: SPRING_PROFILES_ACTIVE
+            - name: AWS_REGION
+              valueFrom:
+                configMapKeyRef:
+                  name: my-configmap
+                  key: AWS_REGION
+            - name: SQS_QUEUE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: my-configmap
+                  key: SQS_QUEUE_NAME
+            - name: SQS_QUEUE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: my-configmap
+                  key: AUDIT_SQS_URL
           resources:
            requests:
              cpu: "50m"
