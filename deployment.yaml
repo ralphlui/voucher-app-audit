@@ -44,6 +44,13 @@ spec:
                 configMapKeyRef:
                   name: my-configmap
                   key: SPRING_PROFILES_ACTIVE
+          resources:
+           requests:
+             cpu: "50m"
+             memory: "200Mi"
+           limits:
+             cpu: "200m"
+             memory: "350Mi"
 
 ---
 apiVersion: v1
@@ -55,6 +62,6 @@ spec:
     app: voucher-app-audit
   ports:
     - protocol: TCP
-      port: 8080
+      port: 8084
       targetPort: 8084
   type: NodePort
