@@ -4,7 +4,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -31,10 +30,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import sg.edu.nus.iss.voucher.audit.logger.util.DTOMapper;
 import sg.edu.nus.iss.voucher.audit.logger.dto.AuditLogDTO;
 import sg.edu.nus.iss.voucher.audit.logger.entity.AuditLog;
 import sg.edu.nus.iss.voucher.audit.logger.service.Impl.AuditLogServiceImpl;
+import sg.edu.nus.iss.voucher.audit.logger.util.DTOMapper;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -83,5 +82,84 @@ public class AuditLogTriggeringTests {
 				.andExpect(jsonPath("$.success").value(true)).andExpect(jsonPath("$.data[0].auditId").value(1))
 				.andDo(print());
 	}
+	
+	@Test
+	void testSearchAuditLogsWithActivityTypeAndUserId() throws Exception {
+	    Pageable pageable = PageRequest.of(0, 10, Sort.by("lastupdatedDate").ascending());
+	    Map<Long, List<AuditLogDTO>> mockAuditDataMap = new HashMap<>();
+	    mockAuditDataMap.put(0L, mockAuditLog);
+
+	    Mockito.when(auditLogService.searchAuditLogs("login", "12345", pageable)).thenReturn(mockAuditDataMap);
+
+	    mockMvc.perform(MockMvcRequestBuilders.get("/api/audit/searchByParams")
+	            .param("activityType", "login")
+	            .param("userId", "12345")
+	            .param("page", "0")
+	            .param("size", "10")
+	            .contentType(MediaType.APPLICATION_JSON))
+	        .andExpect(MockMvcResultMatchers.status().isOk())
+	        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+	        .andExpect(jsonPath("$.success").value(true))
+	        .andExpect(jsonPath("$.data[0].auditId").value(1))
+	        .andDo(print());
+	}
+
+	@Test
+	void testSearchAuditLogsWithActivityTypeOnly() throws Exception {
+	    Pageable pageable = PageRequest.of(0, 10, Sort.by("lastupdatedDate").ascending());
+	    Map<Long, List<AuditLogDTO>> mockAuditDataMap = new HashMap<>();
+	    mockAuditDataMap.put(0L, mockAuditLog); 
+
+	    Mockito.when(auditLogService.searchAuditLogs("login", null, pageable)).thenReturn(mockAuditDataMap);
+
+	    mockMvc.perform(MockMvcRequestBuilders.get("/api/audit/searchByParams")
+	            .param("activityType", "login")
+	            .param("page", "0")
+	            .param("size", "10")
+	            .contentType(MediaType.APPLICATION_JSON))
+	        .andExpect(MockMvcResultMatchers.status().isOk())
+	        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+	        .andExpect(jsonPath("$.success").value(true))
+	        .andExpect(jsonPath("$.data[0].auditId").value(1))
+	        .andDo(print());
+	}
+
+	@Test
+	void testSearchAuditLogsWithUserIdOnly() throws Exception {
+	    Pageable pageable = PageRequest.of(0, 10, Sort.by("lastupdatedDate").ascending());
+	    Map<Long, List<AuditLogDTO>> mockAuditDataMap = new HashMap<>();
+	    mockAuditDataMap.put(1L, mockAuditLog.subList(1, 2)); 
+
+	    Mockito.when(auditLogService.searchAuditLogs(null, "12345", pageable)).thenReturn(mockAuditDataMap);
+
+	    mockMvc.perform(MockMvcRequestBuilders.get("/api/audit/searchByParams")
+	            .param("userId", "12345")
+	            .param("page", "0")
+	            .param("size", "10")
+	            .contentType(MediaType.APPLICATION_JSON))
+	        .andExpect(MockMvcResultMatchers.status().isOk())
+	        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+	        .andExpect(jsonPath("$.success").value(true))
+	        .andExpect(jsonPath("$.data[0].auditId").value(2))
+	        .andDo(print());
+	}
+
+	@Test
+	void testSearchAuditLogsNoParams() throws Exception {
+	    Pageable pageable = PageRequest.of(0, 10, Sort.by("lastupdatedDate").ascending());
+
+	    Mockito.when(auditLogService.searchAuditLogs(null, null, pageable)).thenReturn(new HashMap<>());
+
+	    mockMvc.perform(MockMvcRequestBuilders.get("/api/audit/searchByParams")
+	            .param("page", "0")
+	            .param("size", "10")
+	            .contentType(MediaType.APPLICATION_JSON))
+	        .andExpect(MockMvcResultMatchers.status().isNotFound())
+	        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+	        .andExpect(jsonPath("$.success").value(false))
+	        .andExpect(jsonPath("$.message").value("No audit logs found."))
+	        .andDo(print());
+	}
+
 
 }
